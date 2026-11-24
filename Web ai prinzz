@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web AI Gratis — by Prince</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #0f172a; color: #e2e8f0;
+    min-height: 100vh;
+  }
+  header {
+    background: #1e293b; padding: 16px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 2px solid #38bdf8;
+    flex-wrap: wrap; gap: 10px;
+  }
+  header h1 { font-size: 20px; color: #38bdf8; }
+  .btn {
+    background: #38bdf8; color: #0f172a; border: none;
+    padding: 10px 18px; border-radius: 8px; cursor: pointer;
+    font-weight: bold; font-size: 14px; transition: .2s;
+  }
+  .btn:hover { background: #0ea5e9; }
+  .btn-danger { background: #ef4444; color: white; }
+  .btn-danger:hover { background: #dc2626; }
+  main { max-width: 800px; margin: 30px auto; padding: 0 16px; }
+  .card {
+    background: #1e293b; padding: 24px; border-radius: 12px;
+    margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,.3);
+  }
+  .card h2 { color: #38bdf8; margin-bottom: 12px; font-size: 18px; }
+  .hidden { display: none; }
+
+  /* Profil pembuat */
+  .creator { text-align: center; }
+  .avatar {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; font-weight: bold; color: #0f172a;
+    margin: 0 auto 16px;
+  }
+  .creator h2 { font-size: 24px; }
+  .creator p { color: #94a3b8; margin-top: 6px; }
+  .badge {
+    display: inline-block; background: #0f172a; color: #38bdf8;
+    padding: 4px 12px; border-radius: 20px; font-size: 12px;
+    margin-top: 12px; border: 1px solid #38bdf8;
+  }
+
+  /* Chat */
+  #chatBox {
+    height: 300px; overflow-y: auto; background: #0f172a;
+    border-radius: 8px; padding: 16px; margin-bottom: 12px;
+  }
+  .msg { margin-bottom: 12px; padding: 10px 14px; border-radius: 10px; max-width: 80%; line-height: 1.5; }
+  .msg.user { background: #38bdf8; color: #0f172a; margin-left: auto; }
+  .msg.ai { background: #334155; }
+  .chat-input { display: flex; gap: 8px; }
+  .chat-input input {
+    flex: 1; padding: 12px; border-radius: 8px; border: none;
+    background: #0f172a; color: #e2e8f0; font-size: 14px;
+  }
+
+  /* Admin */
+  input, textarea {
+    width: 100%; padding: 10px; margin-bottom: 10px;
+    border-radius: 8px; border: 1px solid #334155;
+    background: #0f172a; color: #e2e8f0; font-size: 14px;
+  }
+  textarea { min-height: 80px; resize: vertical; }
+  label { font-size: 13px; color: #94a3b8; display: block; margin-bottom: 4px; }
+  .msg-note { font-size: 13px; color: #94a3b8; margin-top: 8px; }
+  footer { text-align: center; padding: 20px; color: #64748b; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <h1>🤖 Web AI Gratis</h1>
+  <div>
+    <button class="btn" id="navHome">Beranda</button>
+    <button class="btn" id="navAdmin">Admin</button>
+  </div>
+</header>
+
+<!-- ============ HALAMAN PUBLIK ============ -->
+<main id="pageHome">
+
+  <!-- Kartu Pembuat -->
+  <div class="card creator">
+    <div class="avatar" id="avatar">P</div>
+    <h2 id="creatorName">Prince</h2>
+    <p id="creatorDesc">Pembuat Web AI Gratis untuk penggunaan yang baik.</p>
+    <span class="badge" id="creatorContact">📧 email@kamu.com</span>
+  </div>
+
+  <!-- Chat AI -->
+  <div class="card">
+    <h2>💬 Chat AI (Demo)</h2>
+    <div id="chatBox">
+      <div class="msg ai">Halo! Saya AI demo buatan Prince. Tanyakan apa saja. (Jawaban masih contoh — nanti kita sambungkan ke API AI asli.)</div>
+    </div>
+    <div class="chat-input">
+      <input id="chatInput" placeholder="Tulis pertanyaan..." onkeydown="if(event.key==='Enter') sendMsg()">
+      <button class="btn" onclick="sendMsg()">Kirim</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- ============ HALAMAN ADMIN ============ -->
+<main id="pageAdmin" class="hidden">
+  <div class="card">
+    <h2>🔐 Login Admin</h2>
+    <div id="loginForm">
+      <label>Password Admin</label>
+      <input type="password" id="adminPass" placeholder="Masukkan password" onkeydown="if(event.key==='Enter') login()">
+      <button class="btn" onclick="login()">Masuk</button>
+      <p class="msg-note">Password default: <b>admin123</b></p>
+    </div>
+  </div>
+
+  <div id="adminPanel" class="hidden">
+    <div class="card">
+      <h2>⚙️ Controller — Kelola Konten</h2>
+      <label>Nama Pembuat</label>
+      <input id="inName">
+      <label>Deskripsi</label>
+      <textarea id="inDesc"></textarea>
+      <label>Kontak / Sosial Media</label>
+      <input id="inContact">
+      <button class="btn" onclick="saveContent()">💾 Simpan Perubahan</button>
+      <button class="btn btn-danger" onclick="resetContent()">Reset</button>
+      <p class="msg-note" id="saveNote"></p>
+    </div>
+
+    <div class="card">
+      <h2>📨 Pesan Masuk (dari chat)</h2>
+      <div id="inbox"></div>
+      <button class="btn btn-danger" onclick="clearInbox()" style="margin-top:10px">Hapus Semua</button>
+    </div>
+
+    <div class="card">
+      <h2>🔑 Ganti Password Admin</h2>
+      <label>Password Baru</label>
+      <input type="password" id="newPass" placeholder="Password baru">
+      <button class="btn" onclick="changePass()">Simpan Password</button>
+      <p class="msg-note" id="passNote"></p>
+    </div>
+  </div>
+</main>
+
+<footer>© 2025 — Dibuat oleh <b>Prince</b> · Web AI Gratis untuk penggunaan yang baik</footer>
+
+<script>
+/* ================= DATA ================= */
+const DEFAULTS = {
+  name: "Prince",
+  desc: "Pembuat Web AI Gratis untuk penggunaan yang baik.",
+  contact: "📧 email@kamu.com · GitHub · Instagram"
+};
+
+function load() {
+  const saved = JSON.parse(localStorage.getItem("webai_content") || "null");
+  return saved || DEFAULTS;
+}
+function save(data) { localStorage.setItem("webai_content", JSON.stringify(data)); }
+
+/* ================= RENDER PUBLIK ================= */
+function renderPublic() {
+  const d = load();
+  document.getElementById("creatorName").textContent = d.name;
+  document.getElementById("creatorDesc").textContent = d.desc;
+  document.getElementById("creatorContact").textContent = d.contact;
+  document.getElementById("avatar").textContent = (d.name || "P").charAt(0).toUpperCase();
+  document.title = "Web AI Gratis — by " + d.name;
+}
+
+/* ================= NAVIGASI ================= */
+document.getElementById("navHome").onclick = () => {
+  document.getElementById("pageHome").classList.remove("hidden");
+  document.getElementById("pageAdmin").classList.add("hidden");
+};
+document.getElementById("navAdmin").onclick = () => {
+  document.getElementById("pageHome").classList.add("hidden");
+  document.getElementById("pageAdmin").classList.remove("hidden");
+};
+
+/* ================= CHAT DEMO ================= */
+function addMsg(text, who) {
+  const box = document.getElementById("chatBox");
+  const div = document.createElement("div");
+  div.className = "msg " + who;
+  div.textContent = text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+function sendMsg() {
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+  if (!text) return;
+  addMsg(text, "user");
+  input.value = "";
+
+  const inbox = JSON.parse(localStorage.getItem("webai_inbox") || "[]");
+  inbox.push({ text, time: new Date().toLocaleString("id-ID") });
+  localStorage.setItem("webai_inbox", JSON.stringify(inbox));
+
+  setTimeout(() => {
+    addMsg("Terima kasih! Pesanmu sudah dicatat oleh sistem Prince. (Ini AI demo — nanti disambungkan ke API AI asli.)", "ai");
+  }, 600);
+}
+
+/* ================= ADMIN ================= */
+function getPass() { return localStorage.getItem("webai_pass") || "admin123"; }
+
+function login() {
+  const pass = document.getElementById("adminPass").value;
+  if (pass === getPass()) {
+    document.getElementById("loginForm").classList.add("hidden");
+    document.getElementById("adminPanel").classList.remove("hidden");
+    loadAdminForm();
+    renderInbox();
+  } else {
+    alert("Password salah!");
+  }
+}
+
+function loadAdminForm() {
+  const d = load();
+  document.getElementById("inName").value = d.name;
+  document.getElementById("inDesc").value = d.desc;
+  document.getElementById("inContact").value = d.contact;
+}
+
+function saveContent() {
+  const data = {
+    name: document.getElementById("inName").value || DEFAULTS.name,
+    desc: document.getElementById("inDesc").value || DEFAULTS.desc,
+    contact: document.getElementById("inContact").value || DEFAULTS.contact
+  };
+  save(data);
+  renderPublic();
+  document.getElementById("saveNote").textContent = "✅ Tersimpan! Buka Beranda untuk melihat.";
+}
+
+function resetContent() {
+  if (confirm("Reset ke default?")) {
+    localStorage.removeItem("webai_content");
+    loadAdminForm();
+    renderPublic();
+  }
+}
+
+function changePass() {
+  const np = document.getElementById("newPass").value.trim();
+  if (np.length < 4) { document.getElementById("passNote").textContent = "❌ Minimal 4 karakter."; return; }
+  localStorage.setItem("webai_pass", np);
+  document.getElementById("passNote").textContent = "✅ Password diubah!";
+  document.getElementById("newPass").value = "";
+}
+
+function renderInbox() {
+  const inbox = JSON.parse(localStorage.getItem("webai_inbox") || "[]");
+  const box = document.getElementById("inbox");
+  if (inbox.length === 0) { box.innerHTML = "<p class='msg-note'>Belum ada pesan.</p>"; return; }
+  box.innerHTML = inbox.map(m =>
+    `<div class="card" style="padding:12px;margin-bottom:8px;background:#0f172a">
+       <div>${m.text}</div>
+       <div class="msg-note">${m.time}</div>
+     </div>`).join("");
+}
+
+function clearInbox() {
+  if (confirm("Hapus semua pesan?")) {
+    localStorage.removeItem("webai_inbox");
+    renderInbox();
+  }
+}
+
+/* ================= START ================= */
+renderPublic();
+</script>
+</body>
+</html>
